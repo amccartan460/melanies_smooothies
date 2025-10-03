@@ -1,6 +1,7 @@
 # Import python packages
 import streamlit as st
 from snowflake.snowpark.functions import col, when_matched
+import requests
 cnx = st.connection("snowflake")
 
 # Write directly to the app
@@ -14,14 +15,12 @@ st.write(
 #     ("Banana", "Strawberries", "Peaches"),
 # )
 
-# st.write("Your favourite fruit is:", option)
 
 name_on_order = st.text_input('Name on Smoothie:')
 st.write('The name on your Smoothie will be:', name_on_order)
 
 session = cnx.session()
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'))
-# st.dataframe(data=my_dataframe, use_container_width=True)
 
 ingredients_list = st.multiselect(
     'Choose up to 5 ingredients:'
@@ -34,6 +33,8 @@ if ingredients_list:
     
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
+        smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
+        st.text(smoothiefroot_response.json())
 
     # st.write(ingredients_string)
     
@@ -51,6 +52,4 @@ if ingredients_list:
 
     st.write(my_insert_stmt)
 
-import requests
-smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
-st.text(smoothiefroot_response.json())
+
